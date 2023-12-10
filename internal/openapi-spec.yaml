@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
-  title: Payment API
+  title: Cashflo APIs (Internal)
   version: 1.0.0
 paths:
-  /transactions:
+  /v1/payout/payment:
     post:
-      summary: Create a new payment transaction
+      summary: Nova Create a new payment transaction
       requestBody:
         required: true
         content:
