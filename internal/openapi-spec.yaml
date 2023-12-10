@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: Payment API
+  version: 1.0.0
+paths:
+  /transactions:
+    post:
+      summary: Create a new payment transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PaymentTransaction'
+            example:
+              - sender_account_id: "IN123456789"
+                recipient_account_number: "9876543210"
+                amount: 1000.00
+                currency: "INR"
+                payment_method: "bank_transfer"
+                reference_id: "PAYOUT_IN_20231025_001"
+                recipient_details:
+                  recipient_name: "John Doe"
+                  bank_name: "HDFC Bank"
+                  ifsc_code: "HDFC0000123"
+                  branch_name: "Mumbai Branch"
+                  bank_address: "123 Main Street, Mumbai, India"
+                payment_category:
+                  category: "deducation"
+                  sub-category: "platformFee"
+              - sender_account_id: "IN123456789"
+                recipient_account_number: "9876543210"
+                amount: 1000.00
+                currency: "INR"
+                payment_method: "bank_transfer"
+                reference_id: "PAYOUT_IN_20231025_001"
+                recipient_details:
+                  recipient_name: "John Doe"
+                  bank_name: "HDFC Bank"
+                  ifsc_code: "HDFC0000123"
+                  branch_name: "Mumbai Branch"
+                  bank_address: "123 Main Street, Mumbai, India"
+                payment_category:
+                  category: "payment"
+                  sub-category: "invoice"
+      responses:
+        '201':
+          description: Transaction created successfully
+        '400':
+          description: Bad request, invalid input
+
+components:
+  schemas:
+    PaymentTransaction:
+      type: object
+      properties:
+        sender_account_id:
+          type: string
+        recipient_account_number:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        payment_method:
+          type: string
+        reference_id:
+          type: string
+        recipient_details:
+          $ref: '#/components/schemas/RecipientDetails'
+        payment_category:
+          $ref: '#/components/schemas/PaymentCategory'
+
+    RecipientDetails:
+      type: object
+      properties:
+        recipient_name:
+          type: string
+        bank_name:
+          type: string
+        ifsc_code:
+          type: string
+        branch_name:
+          type: string
+        bank_address:
+          type: string
+
+    PaymentCategory:
+      type: object
+      properties:
+        category:
+          type: string
+        sub-category:
+          type: string
