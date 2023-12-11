@@ -2,10 +2,13 @@ openapi: 3.0.3
 info:
   title: Cashflo APIs (Internal)
   version: 1.0.0
+tags:
+  - name: Nova
+    description: Platform for managing payments in Cashflo
 paths:
-  /v1/payout/payment:
+  /v1/nova/payout/payment:
     post:
-      summary: Nova Create a new payment transaction
+      summary: Create a new payment transaction in Nova
       requestBody:
         required: true
         content:
@@ -15,77 +18,92 @@ paths:
               items:
                 $ref: '#/components/schemas/PaymentTransaction'
             example:
-              - sender_account_id: "IN123456789"
-                recipient_account_number: "9876543210"
+              - senderAccountId: "IN123456789"
+                recipientAccountNumber: "9876543210"
                 amount: 1000.00
                 currency: "INR"
-                payment_method: "bank_transfer"
-                reference_id: "PAYOUT_IN_20231025_001"
-                recipient_details:
-                  recipient_name: "John Doe"
-                  bank_name: "HDFC Bank"
-                  ifsc_code: "HDFC0000123"
-                  branch_name: "Mumbai Branch"
-                  bank_address: "123 Main Street, Mumbai, India"
-                payment_category:
+                paymentMethod: "bank_transfer"
+                referenceId: "PAYOUT_IN_20231025_001"
+                recipientDetails:
+                  recipientName: "John Doe"
+                  bankName: "HDFC Bank"
+                  ifscCode: "HDFC0000123"
+                  branchName: "Mumbai Branch"
+                  bankAddress: "123 Main Street, Mumbai, India"
+                paymentCategory:
                   category: "deducation"
-                  sub-category: "platformFee"
-              - sender_account_id: "IN123456789"
-                recipient_account_number: "9876543210"
+                  subCategory: "platformFee"
+              - senderAccountId: "IN123456789"
+                recipientAccountNumber: "9876543210"
                 amount: 1000.00
                 currency: "INR"
-                payment_method: "bank_transfer"
-                reference_id: "PAYOUT_IN_20231025_001"
-                recipient_details:
-                  recipient_name: "John Doe"
-                  bank_name: "HDFC Bank"
-                  ifsc_code: "HDFC0000123"
-                  branch_name: "Mumbai Branch"
-                  bank_address: "123 Main Street, Mumbai, India"
-                payment_category:
+                paymentMethod: "bank_transfer"
+                referenceId: "PAYOUT_IN_20231025_001"
+                recipientDetails:
+                  recipientName: "John Doe"
+                  bankName: "HDFC Bank"
+                  ifscCode: "HDFC0000123"
+                  branchName: "Mumbai Branch"
+                  bankAddress: "123 Main Street, Mumbai, India"
+                paymentCategory:
                   category: "payment"
-                  sub-category: "invoice"
+                  subCategory: "invoice"
       responses:
         '201':
           description: Transaction created successfully
+          content:
+            application/json:
+              example:
+                requestId: "abc12345"
+                message: "Transaction created successfully"
         '400':
           description: Bad request, invalid input
-
+          content:
+            application/json:
+              examples:
+                validationError:
+                  value:
+                    errorCode: "VALIDATION_ERROR"
+                    errorMessage: "Invalid input, please check your request payload"
+                duplicateRequest:
+                  value:
+                    errorCode: "DUPLICATE_REQUEST"
+                    errorMessage: "Error processing the request. This request has already been processed."
 components:
   schemas:
     PaymentTransaction:
       type: object
       properties:
-        sender_account_id:
+        senderAccountId:
           type: string
-        recipient_account_number:
+        recipientAccountNumber:
           type: string
         amount:
           type: number
           format: double
         currency:
           type: string
-        payment_method:
+        paymentMethod:
           type: string
-        reference_id:
+        referenceId:
           type: string
-        recipient_details:
+        recipientDetails:
           $ref: '#/components/schemas/RecipientDetails'
-        payment_category:
+        paymentCategory:
           $ref: '#/components/schemas/PaymentCategory'
 
     RecipientDetails:
       type: object
       properties:
-        recipient_name:
+        recipientName:
           type: string
-        bank_name:
+        bankName:
           type: string
-        ifsc_code:
+        ifscCode:
           type: string
-        branch_name:
+        branchName:
           type: string
-        bank_address:
+        bankAddress:
           type: string
 
     PaymentCategory:
@@ -93,5 +111,5 @@ components:
       properties:
         category:
           type: string
-        sub-category:
+        subCategory:
           type: string
