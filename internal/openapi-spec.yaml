@@ -20,7 +20,7 @@ paths:
             example:
               - senderAccountId: "IN123456789"
                 recipientAccountNumber: "9876543210"
-                amount: 1000.00
+                amount: 10.00
                 currency: "INR"
                 paymentMethod: "bank_transfer"
                 referenceId: "PAYOUT_IN_20231025_001"
