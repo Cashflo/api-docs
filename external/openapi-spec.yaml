@@ -1,0 +1,912 @@
+openapi: 3.0.3
+info:
+  title: Purchase Order API
+  version: 1.0.0
+
+
+paths:
+  "/v1/ingest/purchaseOrders":
+    post:
+      summary: Ingests Purchase Orders
+      description: Endpoint to ingest purchase orders.
+      security:
+        - jwt: []  # Requires JWT authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrder'
+            example:
+              $ref: '#/components/examples/basicExample'
+      responses:
+        '202':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  "/v1/ingest/grns":
+    post:
+      summary: Ingests Goods Receipt Note (GRN)
+      description: Endpoint to ingest Goods Receipt Note (GRN)
+      security:
+        - jwt: [ ]  # Requires JWT authorization
+      requestBody:
+        description: GRN Request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GRNRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  "/v1/ingest/errors":
+    get:
+      summary: Ingestion errors associated with particular batch of ingestion
+      description: Errors for Purchase Orders
+      security:
+        - jwt: [ ]  # Requires JWT authorization
+      parameters:
+        - name: batchId
+          in: query
+          description: Find errors for particular ingestion batch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseOrderErrorsResponse"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    PurchaseOrder:
+      type: object
+      required:
+        - buyerOrgId
+        - purchaseOrders
+      properties:
+        skipDuplicates:
+          type: boolean
+          description: Whether to skip duplicate purchase orders
+        buyerOrgId:
+          type: string
+          description: Identifier for the buyer's organization
+        purchaseOrders:
+          type: array
+          description: List of purchase orders
+          items:
+            $ref: "#/components/schemas/SinglePurchaseOrder"
+
+    SinglePurchaseOrder:
+      type: object
+      required:
+        - status
+        - purchaseOrderNumber
+        - buyFromVendorMasterNumber
+        - sourceCreationDate
+        - deliveryAt
+        - shipToBuyerFacilityCode
+        - billToBuyerFacilityCode
+        - totalAmount
+        - purchaseOrderItems
+        - payToVendorMasterNumber
+        - itemCount
+        - deliveredTotalAmount
+      properties:
+        status:
+          type: integer
+          description: Status of the purchase order
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+          description: Metadata for the purchase order
+        purchaseOrderNumber:
+          type: string
+          description: Unique identifier for the purchase order
+        buyFromVendorMasterNumber:
+          type: string
+          description: Identifier for the vendor from whom the purchase order is made
+        sourceCreationDate:
+          type: string
+          format: date-time
+          description: Date and time when the purchase order was created
+        deliveryAt:
+          type: string
+          format: date-time
+          description: Date and time when the purchase order should be delivered
+        shipToBuyerFacilityCode:
+          type: string
+          description: Code for the facility where the items should be shipped to
+        billToBuyerFacilityCode:
+          type: string
+          description: Code for the facility where the bill should be sent to
+        totalAmount:
+          type: number
+          description: Total amount of the purchase order
+        purchaseOrderItems:
+          type: array
+          description: List of items in the purchase order
+          items:
+            $ref: "#/components/schemas/PurchaseOrderItem"
+        payToVendorMasterNumber:
+          type: string
+          description: Identifier for the vendor to whom the payment should be made
+        itemCount:
+          type: integer
+          description: Total number of items in the purchase order
+        deliveredTotalAmount:
+          type: number
+          description: Total amount of items delivered
+
+    Metadata:
+      type: object
+      properties:
+        pocode:
+          type: string
+          description: Purchase order code
+        podate:
+          type: string
+          description: Date and time when the purchase order was created
+        vendor_code:
+          type: string
+          description: Code for the vendor
+        vendor_name:
+          type: string
+          description: Name of the vendor
+        exp_del_date:
+          type: string
+          format: date-time
+          description: Expected delivery date and time
+        buyername:
+          type: string
+          description: Name of the buyer
+        ext_pocode:
+          type: string
+          description: External purchase order code
+        status:
+          type: string
+          description: Status of the purchase order
+        po_amt:
+          type: string
+          description: Purchase order amount
+        po_currency:
+          type: string
+          description: Currency of the purchase order
+        po_taxamt:
+          type: string
+          description: Tax amount of the purchase order
+        poexcise:
+          type: string
+          description: Excise amount of the purchase order
+        po_disc_amt:
+          type: string
+          description: Discount amount of the purchase order
+        po_qty:
+          type: string
+          description: Quantity in the purchase order
+        pocreated_loc:
+          type: string
+          description: Location where the purchase order was created
+        del_loc:
+          type: string
+          description: Delivery location
+        del_locname:
+          type: string
+          description: Name of the delivery location
+        formcapplicable:
+          type: string
+          description: Whether the purchase order is applicable to a form
+        terms:
+          type: string
+          description: Terms of the purchase order
+        potype:
+          type: string
+          description: Type of the purchase order
+        remarks:
+          type: string
+          description: Remarks for the purchase order
+        referenceno:
+          type: string
+          description: Reference number of the purchase order
+        udf1:
+          type: string
+          description: User-defined field 1
+        udf2:
+          type: string
+          description: User-defined field 2
+        udf3:
+          type: string
+          description: User-defined field 3
+        udf4:
+          type: string
+          description: User-defined field 4
+        udf5:
+          type: string
+          description: User-defined field 5
+        udf6:
+          type: string
+          description: User-defined field 6
+        udf7:
+          type: string
+          description: User-defined field 7
+        udf8:
+          type: string
+          description: User-defined field 8
+        udf9:
+          type: string
+          description: User-defined field 9
+        udf10:
+          type: string
+          description: User-defined field 10
+        masterPOCode:
+          type: string
+          description: Master purchase order code
+        poTags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the purchase order
+        expiry_date:
+          type: string
+          description: Expiry date of the purchase order
+        ext_del_loc:
+          type: string
+          description: External delivery location
+        createDate:
+          type: string
+          format: date-time
+          description: Date and time when the purchase order was created
+        updateDate:
+          type: string
+          format: date-time
+          description: Date and time when the purchase order was last updated
+        externalVendorCode:
+          type: string
+          description: External code for the vendor
+        printUrl:
+          type: string
+          description: URL for printing the purchase order
+
+    PurchaseOrderItem:
+      type: object
+      required:
+        - purchaseOrderItemNo
+        - quantity
+        - quantityReceived
+        - ratePerUnit
+        - gstRate
+        - discount
+        - netAmount
+        - totalGstAmount
+        - itemTotalAmount
+      properties:
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+          description: Metadata for the purchase order item
+        materialDescription:
+          type: string
+          description: Description of the material in the purchase order item
+        purchaseOrderItemNo:
+          type: string
+          description: Unique identifier for the purchase order item
+        quantity:
+          type: number
+          description: Quantity of the material in the purchase order item
+        quantityReceived:
+          type: number
+          description: Quantity of the material received
+        ratePerUnit:
+          type: number
+          description: Rate per unit of the material
+        gstRate:
+          type: number
+          description: GST rate applied to the material
+        discount:
+          type: number
+          description: Discount applied to the material
+        netAmount:
+          type: number
+          description: Net amount for the material
+        totalGstAmount:
+          type: number
+          description: Total GST amount for the material
+        itemTotalAmount:
+          type: number
+          description: Total amount for the purchase order item
+
+    IngestionSuccess:
+      type: object
+      properties:
+        batchId:
+          type: string
+          description: Ingestion batch id for retriving error details
+        message:
+          type: string
+          description: Informative message
+    GRNRequest:
+      type: object
+      description: Request structure for processing GRN
+      properties:
+        skipDuplicates:
+          type: boolean
+          description: Flag to skip duplicate entries
+        buyerOrgId:
+          type: string
+          description: ID of the buying organization
+        grns:
+          type: array
+          description: List of Goods Receipt Note entries
+          items:
+            $ref: '#/components/schemas/GRNEntry'
+
+    GRNEntry:
+      type: object
+      description: Goods Receipt Note entry details
+      properties:
+        metadata:
+          $ref: '#/components/schemas/GRNMetadata'
+        grnNumber:
+          type: string
+          description: Unique identifier for the GRN entry
+        buyFromVendorMasterNumber:
+          type: string
+          description: Vendor master number for the buying organization
+        vendorInvoiceNo:
+          type: string
+          description: Vendor's invoice number
+        orderNo:
+          type: string
+          description: Purchase order number
+        sourceCreationDate:
+          type: string
+          description: Date of GRN creation
+        shipToBuyerFacilityCode:
+          type: string
+          description: Code for the buyer's facility
+        grnItems:
+          type: array
+          description: List of items in the GRN
+          items:
+            $ref: '#/components/schemas/GRNItem'
+        billToBuyerFacilityCode:
+          type: string
+          description: Code for the buyer's billing facility
+        payToVendorMasterNumber:
+          type: string
+          description: Vendor master number for payment
+
+    GRNMetadata:
+      type: object
+      description: Metadata for the GRN entry
+      properties:
+        pocode:
+          type: string
+          description: Purchase order code
+        ext_pocode:
+          type: string
+          description: External purchase order code
+        asncode:
+          type: string
+          description: ASN code
+        inboundcode:
+          type: string
+          description: Inbound code
+        externinboundcode:
+          type: string
+          description: External inbound code
+        grnno:
+          type: string
+          description: GRN number
+        invoiceTaxAmt:
+          type: string
+          description: Invoice tax amount
+        vendor_code:
+          type: string
+          description: Vendor code
+        vendor_name:
+          type: string
+          description: Vendor name
+        status:
+          type: string
+          description: GRN status
+        pocreated_loc:
+          type: string
+          description: Purchase order creation location
+        del_loc:
+          type: string
+          description: Delivery location
+        del_locname:
+          type: string
+          description: Delivery location name
+        asn_delloc:
+          type: string
+          description: ASN delivery location
+        invoiceno:
+          type: string
+          description: Invoice number
+        invoicedate:
+          type: string
+          description: Invoice date
+        invoice_amt:
+          type: string
+          description: Invoice amount
+        invoicetax:
+          type: string
+          description: Invoice tax
+        no_ofboxes:
+          type: string
+          description: Number of boxes
+        vehicleno:
+          type: string
+          description: Vehicle number
+        challan_no:
+          type: string
+          description: Challan number
+        challan_date:
+          type: string
+          description: Challan date
+        remarks:
+          type: string
+          description: Remarks
+        weight:
+          type: string
+          description: Weight
+        material_rcvddate:
+          type: string
+          description: Material received date
+        udf1:
+          type: string
+          description: User-defined field 1
+        udf2:
+          type: string
+          description: User-defined field 2
+        udf3:
+          type: string
+          description: User-defined field 3
+        udf4:
+          type: string
+          description: User-defined field 4
+        udf5:
+          type: string
+          description: User-defined field 5
+        udf6:
+          type: string
+          description: User-defined field 6
+        udf7:
+          type: string
+          description: User-defined field 7
+        udf8:
+          type: string
+          description: User-defined field 8
+        udf9:
+          type: string
+          description: User-defined field 9
+        udf10:
+          type: string
+          description: User-defined field 10
+        currency:
+          type: string
+          description: Currency
+        inbType:
+          type: string
+          description: Inbound type
+        grnDate:
+          type: string
+          description: GRN date
+        gatepasscode:
+          type: string
+          description: Gate pass code
+        grn_qty:
+          type: string
+          description: GRN quantity
+        grn_amount:
+          type: string
+          description: GRN amount
+        grn_BaseCurrAmount:
+          type: string
+          description: GRN Base Currency Amount
+        conversionRate:
+          type: string
+          description: Conversion rate
+        returnCode:
+          type: string
+          description: Return code
+        printUrl:
+          type: string
+          description: URL for printing GRN
+
+    GRNItem:
+      type: object
+      description: Item details in the GRN
+      properties:
+        metadata:
+          $ref: '#/components/schemas/GRNItemMetadata'
+        grnItemNumber:
+          type: string
+          description: Unique identifier for the GRN item
+        quantity:
+          type: string
+          description: Quantity received
+        unitCost:
+          type: string
+          description: Cost per unit
+        gstPercent:
+          type: string
+          description: GST percentage
+        lineDiscount:
+          type: number
+          description: Line discount percentage
+        qtyRejected:
+          type: string
+          description: Quantity rejected
+
+    GRNItemMetadata:
+      type: object
+      description: Metadata for the GRN item
+      properties:
+        lineno:
+          type: string
+          description: Line number
+        ext_lineno:
+          type: string
+          description: External line number
+        po_ext_lineno:
+          type: string
+          description: Purchase order external line number
+        asn_lineno:
+          type: string
+          description: ASN line number
+        status:
+          type: string
+          description: Item status
+        sku:
+          type: string
+          description: SKU (Stock Keeping Unit)
+        uom:
+          type: string
+          description: Unit of Measure
+        uomqty:
+          type: string
+          description: Unit of Measure quantity
+        conversion:
+          type: string
+          description: Conversion factor
+        receivedqty:
+          type: string
+          description: Received quantity
+        bin:
+          type: string
+          description: Storage bin
+        cost:
+          type: string
+          description: Cost
+        currBaseCost:
+          type: string
+          description: Current Base Cost
+        lottable01:
+          type: string
+          description: Lottable field 01
+        lottable02:
+          type: string
+          description: Lottable field 02
+        lottable03:
+          type: string
+          description: Lottable field 03
+        lottable04:
+          type: string
+          description: Lottable field 04
+        lottable05:
+          type: string
+          description: Lottable field 05
+        lottable06:
+          type: string
+          description: Lottable field 06
+        lottable07:
+          type: string
+          description: Lottable field 07
+        polineno:
+          type: string
+          description: Purchase order line number
+        serialNo1:
+          type: array
+          items:
+            type: string
+          description: Serial numbers (1st set)
+        serialNo2:
+          type: array
+          items:
+            type: string
+          description: Serial numbers (2nd set)
+        serialNo3:
+          type: array
+          items:
+            type: string
+          description: Serial numbers (3rd set)
+        udf1:
+          type: string
+          description: User-defined field 1
+        udf2:
+          type: string
+          description: User-defined field 2
+        udf3:
+          type: string
+          description: User-defined field 3
+        udf4:
+          type: string
+          description: User-defined field 4
+        udf5:
+          type: string
+          description: User-defined field 5
+        udf6:
+          type: string
+          description: User-defined field 6
+        udf7:
+          type: string
+          description: User-defined field 7
+        udf8:
+          type: string
+          description: User-defined field 8
+        udf9:
+          type: string
+          description: User-defined field 9
+        udf10:
+          type: string
+          description: User-defined field 10
+        gstRt:
+          type: string
+          description: GST rate
+        igstAmt:
+          type: string
+          description: Integrated GST amount
+        cgstAmt:
+          type: string
+          description: Central GST amount
+        sgstAmt:
+          type: string
+          description: State GST amount
+        cesRt:
+          type: string
+          description: Central Excise duty rate
+        cesAmt:
+          type: string
+          description: Central Excise duty amount
+        cesNonAdvlAmt:
+          type: string
+          description: Non-Advalorem Central Excise duty amount
+        stateCesRt:
+          type: string
+          description: State Excise duty rate
+        stateCesAmt:
+          type: string
+          description: State Excise duty amount
+        stateCesNonAdvlAmt:
+          type: string
+          description: Non-Advalorem State Excise duty amount
+        hsnCode:
+          type: string
+          description: Harmonized System Nomenclature code
+        igstRt:
+          type: string
+          description: Integrated GST rate
+        cgstRt:
+          type: string
+          description: Central GST rate
+        sgstRt:
+          type: string
+          description: State GST rate
+        ugstRt:
+          type: string
+          description: Union Territory GST rate
+        ugstAmt:
+          type: string
+          description: Union Territory GST amount
+        skuUSNs:
+          type: array
+          items:
+            type: string
+          description: SKU Unique Serial Numbers
+        usnDtls:
+          type: array
+          items:
+            type: string
+          description: Unique Serial Number details
+        vendorskucode:
+          type: string
+          description: Vendor SKU code
+        size:
+          type: string
+          description: Size of the item
+        taxPercentage:
+          type: string
+          description: Tax percentage
+
+    GRNResponse:
+      type: object
+      description: Response structure for GRN processing
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the processing was successful
+        message:
+          type: string
+          description: Additional information about the processing result
+
+    PurchaseOrderErrorsResponse:
+      type: object
+      properties:
+        purchaseOrders:
+          type: array
+          items:
+            $ref: "#/components/schemas/PurchaseOrderError"
+          description: List of purchase orders
+
+    PurchaseOrderError:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The status of the purchase order
+        purchaseOrderNumber:
+          type: string
+          description: The purchase order number
+        buyFromVendorMasterNumber:
+          type: integer
+          description: The vendor master number for the buying entity
+        sourceCreationDate:
+          type: string
+          format: date-time
+          description: The creation date of the purchase order
+        deliveryAt:
+          type: string
+          format: date-time
+          description: The delivery date of the purchase order
+        shipToBuyerFacilityCode:
+          type: string
+          description: The facility code for shipping to the buyer
+        billToBuyerFacilityCode:
+          type: string
+          description: The facility code for billing to the buyer
+        totalAmount:
+          type: integer
+          description: The total amount of the purchase order
+        payToVendorMasterNumber:
+          type: integer
+          description: The vendor master number for payment
+        itemCount:
+          type: integer
+          description: The number of items in the purchase order
+        deliveredTotalAmount:
+          type: integer
+          description: The total amount delivered
+        poVendorCode:
+          type: integer
+          nullable: true
+          description: The vendor code associated with the purchase order. It can be null.
+        error:
+          type: string
+          nullable: true
+          description: Any error message associated with the purchase order. It can be null.
+
+      example:
+        status: 1
+        purchaseOrderNumber: "TWH25098"
+        buyFromVendorMasterNumber: 379
+        sourceCreationDate: "2023-10-10T21:34:20"
+        deliveryAt: "2023-12-15T00:00:00"
+        shipToBuyerFacilityCode: "TWH"
+        billToBuyerFacilityCode: "TWH"
+        totalAmount: 588000
+        payToVendorMasterNumber: 379
+        itemCount: 6
+        deliveredTotalAmount: 0
+        poVendorCode: null
+        error: "Vendor Master: 379 not found"
+
+  examples:
+    basicExample:
+      skipDuplicates: false
+      buyerOrgId: "14195"
+      purchaseOrders:
+        - status: 1
+          metadata:
+            pocode: "TWH25689"
+            podate: "03/11/2023 18:23:45"
+            vendor_code: "330"
+            vendor_name: "DURATEX APPARELS"
+            exp_del_date: "30/11/2023 00:00:00"
+            buyername: "Default"
+            # ... (other metadata fields)
+          purchaseOrderNumber: "TWH25689"
+          buyFromVendorMasterNumber: "330"
+          sourceCreationDate: "2023-11-03T18:15:48"
+          deliveryAt: "2023-11-30T00:00:00"
+          shipToBuyerFacilityCode: "TWH"
+          billToBuyerFacilityCode: "TWH"
+          totalAmount: 493500.0
+          purchaseOrderItems:
+            - metadata:
+                skucode: "250831"
+                skuname: "Plaid: Gold & White (Utility)"
+                # ... (other metadata fields)
+              materialDescription: "Plaid: Gold & White (Utility)"
+              purchaseOrderItemNo: "250831"
+              quantity: 40.0
+              quantityReceived: 29.0
+              ratePerUnit: 470.0
+              gstRate: 5.0
+              discount: 0
+              netAmount: 18800.0
+              totalGstAmount: 940.0
+              itemTotalAmount: 19740.0
+          payToVendorMasterNumber: "330"
+          itemCount: 1
+          deliveredTotalAmount: 380700.0
+
+  responses:
+    '200':
+    'Success':
+      description: Ingestion success details
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/IngestionSuccess"
+          example:
+            message: "Ingestion data accepted for processing."
+            batchId: "00hQAanwMn"
+
+    'BadRequest':
+      description: Bad request, invalid input
+      content:
+        application/json:
+          example:
+            errorCode: "BAD_REQUEST"
+            message: "The provided data is invalid. Please check your input."
+    'Unauthorized':
+      description: Unauthorized
+      content:
+        application/json:
+          example:
+            errorCode: "UNAUTHORIZED"
+            message: "Authorization failed. Please provide a valid JWT token."
+    'NotFound':
+      description: Not Found
+      content:
+        application/json:
+          example:
+            errorCode: "NOT_FOUND"
+            message: "Required information not found."
+    'ServerError':
+      description: Internal server error
+      content:
+        application/json:
+          example:
+            errorCode: "INTERNAL_ERROR"
+            message: "An internal server error occurred. Please try again later."
+
+  securitySchemes:
+    jwt:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: JWT authorization header

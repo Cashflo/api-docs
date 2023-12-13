@@ -1,1 +1,4 @@
 /internal-docs
+.idea
+/external-docs
+.DS_Store
