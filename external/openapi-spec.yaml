@@ -5,7 +5,7 @@ info:
 
 
 paths:
-  "/v1/ingest/purchaseOrders":
+  "/v1/ingest/purchase-orders":
     post:
       summary: Ingests Purchase Orders
       description: Endpoint to ingest purchase orders.
