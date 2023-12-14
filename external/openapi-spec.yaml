@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Purchase Order API
+  title: Cashflo Data Ingestion API Documentation
   version: 1.0.0
 
 
