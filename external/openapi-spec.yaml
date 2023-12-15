@@ -41,6 +41,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GRNRequest'
+            example:
+              $ref: '#/components/examples/GRNRequestExample'
       responses:
         '202':
           $ref: '#/components/responses/Success'
@@ -368,24 +370,50 @@ components:
         error:
           type: string
           nullable: true
-          description: Any error message associated with the purchase order. It can be null.
-
+          description: Error message describing the details of error
       example:
-        status: 1
-        purchaseOrderNumber: "BUYER25098"
-        buyFromVendorMasterNumber: 379
-        sourceCreationDate: "2023-10-10T21:34:20"
-        deliveryAt: "2023-12-15T00:00:00"
-        shipToBuyerFacilityCode: "BUYER"
-        billToBuyerFacilityCode: "BUYER"
-        totalAmount: 588000
-        payToVendorMasterNumber: 379
-        itemCount: 6
-        deliveredTotalAmount: 0
-        poVendorCode: null
-        error: "Vendor Master: 379 not found"
+        $ref: '#/components/examples/PurchaseOrderErrorExample'
 
   examples:
+    GRNRequestExample:
+      value:
+        skipDuplicates: false
+        buyerOrgId: "212312"
+        grns:
+          - metadata:
+              pocode: "BUYER23175"
+            grnNumber: "BUYER001777290"
+            buyFromVendorMasterNumber: "339"
+            vendorInvoiceNo: "784/23-24"
+            orderNo: "BUYER23175"
+            sourceCreationDate: "2023-12-11T12:05:33"
+            shipToBuyerFacilityCode: "BUYER"
+            grnItems:
+              - metadata:
+                  lineno: "1"
+                grnItemNumber: "234039"
+                quantity: "47.000"
+                unitCost: "465.000"
+                gstPercent: "5.00"
+                lineDiscount: 0
+                qtyRejected: "0"
+            billToBuyerFacilityCode: "BUYER"
+            payToVendorMasterNumber: "339"
+    PurchaseOrderErrorExample:
+      status: 1
+      purchaseOrderNumber: "BUYER25098"
+      buyFromVendorMasterNumber: 379
+      sourceCreationDate: "2023-10-10T21:34:20"
+      deliveryAt: "2023-12-15T00:00:00"
+      shipToBuyerFacilityCode: "BUYER"
+      billToBuyerFacilityCode: "BUYER"
+      totalAmount: 588000
+      payToVendorMasterNumber: 379
+      itemCount: 6
+      deliveredTotalAmount: 0
+      poVendorCode: null
+      error: "Vendor Master: 379 not found"
+
     PurchaseOrderExample:
       skipDuplicates: false
       buyerOrgId: "14195"
