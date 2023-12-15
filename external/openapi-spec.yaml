@@ -115,7 +115,12 @@ components:
         - payToVendorMasterNumber
         - itemCount
         - deliveredTotalAmount
+        - issuedAt
       properties:
+        issuedAt:
+          type: string
+          format: date-time
+          description: Date and time when the purchase order was issued
         status:
           type: integer
           description: Status of the purchase order
@@ -184,6 +189,7 @@ components:
         - netAmount
         - totalGstAmount
         - itemTotalAmount
+        - materialDescription
       properties:
         metadata:
           $ref: "#/components/schemas/Metadata"
@@ -217,6 +223,9 @@ components:
         itemTotalAmount:
           type: number
           description: Total amount for the purchase order item
+        hsnCode:
+          type: number
+          description: HSN Code for purchase order
 
     IngestionSuccess:
       type: object
@@ -230,6 +239,9 @@ components:
 
     GRNRequest:
       type: object
+      required:
+        - buyerOrgId
+        - grns
       description: Request structure for processing GRN
       properties:
         skipDuplicates:
@@ -242,11 +254,19 @@ components:
           type: array
           description: List of Goods Receipt Note entries
           items:
-            $ref: '#/components/schemas/GRNEntry'
+            $ref: '#/components/schemas/GRNItems'
 
-    GRNEntry:
+    GRNItems:
       type: object
       description: Goods Receipt Note entry details
+      required:
+        - grnNumber
+        - buyFromVendorMasterNumber
+        - vendorInvoiceNo
+        - orderNo
+        - sourceCreationDate
+        - shipToBuyerFacilityCode
+        - grnItems
       properties:
         metadata:
           $ref: '#/components/schemas/Metadata'
@@ -284,6 +304,13 @@ components:
     GRNItem:
       type: object
       description: Item details in the GRN
+      required:
+        - grnItemNumber
+        - quantity
+        - unitCost
+        - gstPercent
+        - lineDiscount
+        - qtyRejected
       properties:
         metadata:
           $ref: '#/components/schemas/Metadata'
