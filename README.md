@@ -1,5 +1,5 @@
 # API Docs
-API Docs for Internal APIs
+API Docs for External/Internal APIs
 
 ## Usage
 1. Make changes in the API specification in the YML Specification and save it
