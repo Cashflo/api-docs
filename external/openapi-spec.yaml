@@ -264,6 +264,7 @@ components:
           description: Purchase order number
         sourceCreationDate:
           type: string
+          format: date-time
           description: Date of GRN creation
         shipToBuyerFacilityCode:
           type: string
