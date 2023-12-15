@@ -19,43 +19,32 @@ paths:
                 $ref: '#/components/schemas/PaymentTransaction'
             example:
               - senderAccountId: "IN123456789"
-                recipientAccountNumber: "9876543210"
                 amount: 10.00
-                currency: "INR"
-                paymentMethod: "bank_transfer"
                 referenceId: "PAYOUT_IN_20231025_001"
+                source: "b2b"
                 recipientDetails:
                   recipientName: "John Doe"
-                  bankName: "HDFC Bank"
                   ifscCode: "HDFC0000123"
-                  branchName: "Mumbai Branch"
-                  bankAddress: "123 Main Street, Mumbai, India"
-                paymentCategory:
-                  category: "deducation"
-                  subCategory: "platformFee"
+                  bankAccountNumber: "9876543210"
               - senderAccountId: "IN123456789"
-                recipientAccountNumber: "9876543210"
                 amount: 1000.00
-                currency: "INR"
-                paymentMethod: "bank_transfer"
-                referenceId: "PAYOUT_IN_20231025_001"
+                referenceId: "PAYOUT_IN_20231025_002"
+                source: "b2b"
                 recipientDetails:
                   recipientName: "John Doe"
-                  bankName: "HDFC Bank"
                   ifscCode: "HDFC0000123"
-                  branchName: "Mumbai Branch"
-                  bankAddress: "123 Main Street, Mumbai, India"
-                paymentCategory:
-                  category: "payment"
-                  subCategory: "invoice"
+                  bankAccountNumber: "9876543210"
+
       responses:
         '201':
           description: Transaction created successfully
           content:
             application/json:
               example:
-                requestId: "abc12345"
-                message: "Transaction created successfully"
+                - referenceId: "PAYOUT_IN_20231025_001"
+                  message: "Transaction created successfully"
+                - referenceId: "PAYOUT_IN_20231025_002"
+                  message: "Duplicate reference id"
         '400':
           description: Bad request, invalid input
           content:
@@ -76,40 +65,27 @@ components:
       properties:
         senderAccountId:
           type: string
-        recipientAccountNumber:
+          description: Buyer account id
+        source:
           type: string
+          description: Source of the payment request
         amount:
           type: number
           format: double
-        currency:
-          type: string
-        paymentMethod:
-          type: string
+          description: Amount to be payed out
         referenceId:
           type: string
+          description: Unique id from the requestor and be used for de-duplicating the payment
         recipientDetails:
           $ref: '#/components/schemas/RecipientDetails'
-        paymentCategory:
-          $ref: '#/components/schemas/PaymentCategory'
 
     RecipientDetails:
       type: object
       properties:
         recipientName:
           type: string
-        bankName:
-          type: string
         ifscCode:
           type: string
-        branchName:
-          type: string
-        bankAddress:
+        bankAccountNumber:
           type: string
 
-    PaymentCategory:
-      type: object
-      properties:
-        category:
-          type: string
-        subCategory:
-          type: string
