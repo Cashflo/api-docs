@@ -77,7 +77,7 @@ paths:
             schema:
               type: object
               items:
-                $ref: '#/components/schemas/DeletePaymentRequestDto'
+                $ref: '#/components/schemas/CancelPaymentRequestDto'
             example:
               referenceIds:
               - PAYOUT_IN_20231025_001
@@ -93,10 +93,10 @@ paths:
                 - referenceId: PAYOUT_IN_20231025_001
                   status: 'success'
                   message: 'Payout request cancelled'
-                - referenceId: PAYOUT_IN_20231025_001
+                - referenceId: PAYOUT_IN_20231025_002
                   status: 'failed'
                   message: 'Payout request is in pending state'
-                - referenceId: PAYOUT_IN_20231025_001
+                - referenceId: WRONG_ID
                   status: 'failed'
                   message: 'No payout request found with reference id: WRONG_ID'
 
@@ -137,7 +137,7 @@ components:
         - b2b_payments
         - venfin
     
-    DeletePaymentRequestDto:
+    CancelPaymentRequestDto:
       type: object
       properties:
         referenceIds:
