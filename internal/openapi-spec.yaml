@@ -16,7 +16,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/PaymentTransaction'
+                $ref: '#/components/schemas/CreatePaymentRequestDto'
             examples:
               "valid payload":
                 value:
@@ -66,10 +66,44 @@ paths:
                   - referenceId: "PAYOUT_IN_20231025_002"
                     status: "failed"
                     message: "Invalid request payload"
+  
+  /payout/cancel-payment-request:
+    post:
+      summary: "Cancels a payment request created in nova"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/DeletePaymentRequestDto'
+            example:
+              referenceIds:
+              - PAYOUT_IN_20231025_001
+              - PAYOUT_IN_20231025_002
+              - WRONG_ID
+      
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                - referenceId: PAYOUT_IN_20231025_001
+                  status: 'success'
+                  message: 'Payout request cancelled'
+                - referenceId: PAYOUT_IN_20231025_001
+                  status: 'failed'
+                  message: 'Payout request is in pending state'
+                - referenceId: PAYOUT_IN_20231025_001
+                  status: 'failed'
+                  message: 'No payout request found with reference id: WRONG_ID'
+
 
 components:
   schemas:
-    PaymentTransaction:
+    CreatePaymentRequestDto:
       type: object
       properties:
         requesterAccountId:
@@ -102,3 +136,11 @@ components:
       enum:
         - b2b_payments
         - venfin
+    
+    DeletePaymentRequestDto:
+      type: object
+      properties:
+        referenceIds:
+          type: array
+          items:
+            type: string
