@@ -6,9 +6,9 @@ tags:
   - name: Nova
     description: Platform for managing payments in Cashflo
 paths:
-  /v1/nova/payout/payment:
+  /payout/payment-request:
     post:
-      summary: Create a new payment transaction in Nova
+      summary: Create a new payment request in Nova
       requestBody:
         required: true
         content:
@@ -17,65 +17,73 @@ paths:
               type: array
               items:
                 $ref: '#/components/schemas/PaymentTransaction'
-            example:
-              - senderAccountId: "IN123456789"
-                amount: 10.00
-                referenceId: "PAYOUT_IN_20231025_001"
-                source: "b2b"
-                recipientDetails:
-                  recipientName: "John Doe"
-                  ifscCode: "HDFC0000123"
-                  bankAccountNumber: "9876543210"
-              - senderAccountId: "IN123456789"
-                amount: 1000.00
-                referenceId: "PAYOUT_IN_20231025_002"
-                source: "b2b"
-                recipientDetails:
-                  recipientName: "John Doe"
-                  ifscCode: "HDFC0000123"
-                  bankAccountNumber: "9876543210"
+            examples:
+              "valid payload":
+                value:
+                - requesterAccountId: "IN123456789"
+                  amount: 10.00
+                  referenceId: "PAYOUT_IN_20231025_001"
+                  source: "b2b_payments"
+                  recipientDetails:
+                    recipientName: "John Doe"
+                    ifscCode: "HDFC0000123"
+                    bankAccountNumber: "9876543210"
+                - requesterAccountId: "IN123456789"
+                  amount: 1000.00
+                  referenceId: "PAYOUT_IN_20231025_002"
+                  source: "b2b_payments"
+                  recipientDetails:
+                    recipientName: "John Doe"
+                    ifscCode: "HDFC0000123"
+                    bankAccountNumber: "9876543210"
+              
+              "invalid payload":
+                value:
+                - requesterAccountId: "IN123456789"
+                  amount: 500.00
+                  referenceId: "PAYOUT_IN_20231025_003"
+                  source: "b2b_payments"
+                  recipientDetails:
+                    recipientName: "John Doe"
+                    bankAccountNumber: "9876543210"
 
       responses:
-        '201':
-          description: Transaction created successfully
-          content:
-            application/json:
-              example:
-                - referenceId: "PAYOUT_IN_20231025_001"
-                  message: "Transaction created successfully"
-                - referenceId: "PAYOUT_IN_20231025_002"
-                  message: "Duplicate reference id"
-        '400':
-          description: Bad request, invalid input
+        '200':
+          description: "Since validation and rejections are at row level the response is always 200"
           content:
             application/json:
               examples:
-                validationError:
+                "valid payload":
                   value:
-                    errorCode: "VALIDATION_ERROR"
-                    errorMessage: "Invalid input, please check your request payload"
-                duplicateRequest:
+                  - referenceId: "PAYOUT_IN_20231025_001"
+                    status: "success"
+                    message: "Request created successfully"
+                  - referenceId: "PAYOUT_IN_20231025_002"
+                    status: "failed"
+                    message: "Duplicate reference id"
+                "invalid payload":
                   value:
-                    errorCode: "DUPLICATE_REQUEST"
-                    errorMessage: "Error processing the request. This request has already been processed."
+                  - referenceId: "PAYOUT_IN_20231025_002"
+                    status: "failed"
+                    message: "Invalid request payload"
+
 components:
   schemas:
     PaymentTransaction:
       type: object
       properties:
-        senderAccountId:
+        requesterAccountId:
           type: string
           description: Buyer account id
         source:
-          type: string
-          description: Source of the payment request
+          $ref: '#/components/schemas/PaymentRequestSource'
         amount:
           type: number
           format: double
-          description: Amount to be payed out
+          description: Amount to be payed out. Max 2 decimal points.
         referenceId:
           type: string
-          description: Unique id from the requestor and be used for de-duplicating the payment
+          description: Unique id used for de-duplicating the payment requests
         recipientDetails:
           $ref: '#/components/schemas/RecipientDetails'
 
@@ -89,3 +97,8 @@ components:
         bankAccountNumber:
           type: string
 
+    PaymentRequestSource:
+      type: string
+      enum:
+        - b2b_payments
+        - venfin
