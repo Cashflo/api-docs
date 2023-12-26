@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
-  title: Cashflo APIs (Internal)
+  title: Nova Payout API suite
   version: 1.0.0
 tags:
-  - name: Nova
-    description: Platform for managing payments in Cashflo
+  - name: Nova Payout
+    description: API suite to manage payment requests and trigger them
 paths:
   /payout/payment-request:
     post:

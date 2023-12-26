@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Nova Ledger API suite
+  version: 1.0.0
+tags:
+  - name: Nova Ledger APIs
+    description: Core API suite to manage ledger entries
+paths:
+  /ledger/originations/bank-transfer:
+    post:
+      summary: Record a successful bank transaction that has happened externally
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/RecordBankTransferDto'
+            examples:
+              "DEBIT":
+                value:
+                - transfers: 
+                  - sourceOriginationExternalId: "00000-0000-0000-0000-000001"
+                    sourceOriginationExternalSource: "INTERNAL"
+                    destinationOriginationExternalId: "999999999999"
+                    destinationOriginationExternalSource: "ICIC00001990"
+                    requesterAccountId: "ZvoRPkuUZ4"
+                    amount: "2"
+                    utr: "UTR1234"
+                    bankTransactionDate: "2023/12/22"
+
+              "CREDIT":
+                value:
+                - transfers: 
+                  - sourceOriginationExternalId: "88888888"
+                    sourceOriginationExternalSource: "HDFC00001111"
+                    destinationOriginationExternalId: "00000-0000-0000-0000-000001"
+                    destinationOriginationExternalSource: "INTERNAL"
+                    requesterAccountId: "ZvoRPkuUZ4"
+                    amount: "2"
+                    utr: "UTR4567"
+                    bankTransactionDate: "2023/12/21"
+
+
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              examples:
+                "success":
+                  value:
+                  - status: success
+                    data:
+                      total: 1
+                      success: 1
+                      failed: 0
+                      errors: []
+                      results: []
+                "error":
+                  value:
+                    - status: success
+                      data:
+                        total: 1
+                        success: 0
+                        failed: 1
+                        errors:
+                        - error: Account not found with external info VENORIEXT0002/BANK.
+                          data:
+                            message: Account not found with external info VENORIEXT0002/BANK.
+                            data:
+                              sourceOriginationExternalId: 00000-0000-0000-0000-000001
+                              sourceOriginationExternalSource: INTERNAL
+                              destinationOriginationExternalId: VENORIEXT0002
+                              destinationOriginationExternalSource: BANK
+                              requesterAccountId: BUYACC0007
+                              amount: 948.5350459703852
+                              utr: UTRKRWIACZ1LUI
+                              bankTransactionDate: 2023/12/22
+                        results: []
+  
+  /ledger/reverse-transfer:
+    post:
+      summary: "Creates ledger entries to reverse a bank transaction"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/ReverseTransferDto'
+            example:
+              utr: 'utr1234'
+              reversalDate: '2023-12-11'
+
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                destWallet:
+                  createdOn: '2023-03-27T13:30:58.406Z'
+                  updatedOn: '2023-12-19T20:19:19.811Z'
+                  walletId: CWALLET001
+                  name: CashFlo Central Wallet
+                  remarks: CashFlo Central Wallet
+                  balance: 4459655.82
+                  updatedBy: system
+                  account:
+                    createdOn: '2023-03-27T13:30:58.186Z'
+                    updatedOn: '2023-03-27T13:30:58.186Z'
+                    accountId: CENTRAL001
+                    externalId: 00000-0000-0000-0000-000000
+                    name: CashFlo Central Account
+                    remarks: CashFlo Central Account
+                    pspType: cashfree
+                    updatedBy: system
+                    notificationSettings:
+                requesterWallet:
+                  createdOn: '2023-05-10T11:36:11.656Z'
+                  updatedOn: '2023-12-19T20:19:19.811Z'
+                  walletId: n9DLA9lQoB
+                  name: OD Apar Industries Limited
+                  remarks: Auto generated wallet
+                  balance: 1588115.22
+                  updatedBy: system
+                  account:
+                    createdOn: '2023-05-10T11:36:11.656Z'
+                    updatedOn: '2023-05-10T11:36:11.656Z'
+                    accountId: ys4K1QULSZ
+                    externalId: '196029'
+                    name: OD Apar Industries Limited
+                    remarks: Buyer
+                    pspType: axis
+                    updatedBy: SsER3ybWFJ
+                    notificationSettings:
+
+components:
+  schemas:
+    RecordBankTransferDto:
+      type: object
+      properties:
+        transfers:
+          type: array
+          description: List of bank transfers to be recorded
+          items:
+            $ref: '#/components/schemas/BankTransferItem'
+
+    BankTransferItem:
+      type: object
+      properties:
+        sourceOriginationExternalId:
+          type: string
+        sourceOriginationExternalSource:
+          type: string
+        destinationOriginationExternalId:
+          type: string
+        destinationOriginationExternalSource:
+          type: string
+        requesterAccountId:
+          type: string
+        amount:
+          type: number
+          format: double
+        utr:
+          type: string
+        bankTransactionDate:
+          type: string
+    
+    ReverseTransferDto:
+      type: object
+      properties:
+        utr:
+          type: string
+        reversalDate:
+          type: string
+        
