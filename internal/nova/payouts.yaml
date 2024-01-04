@@ -20,37 +20,35 @@ paths:
             examples:
               "valid payload":
                 value:
-                  requests:
-                    - requesterAccountId: "IN123456789"
-                      amount: 10.00
-                      referenceId: "PAYOUT_IN_20231025_001"
-                      source: "b2b_payments"
-                      recipientDetails:
-                        recipientName: "John Doe"
-                        ifscCode: "HDFC0000123"
-                        bankAccountNumber: "9876543210"
-                      responseKafkaTopic: "b2b-nova-topic"
-                    - requesterAccountId: "IN123456789"
-                      amount: 1000.00
-                      referenceId: "PAYOUT_IN_20231025_002"
-                      source: "b2b_payments"
-                      recipientDetails:
-                        recipientName: "John Doe"
-                        ifscCode: "HDFC0000123"
-                        bankAccountNumber: "9876543210"
-                      responseKafkaTopic: "b2b-nova-topic"
+                  - requesterAccountId: "IN123456789"
+                    amount: 10.00
+                    referenceId: "PAYOUT_IN_20231025_001"
+                    source: "b2b_payments"
+                    recipientDetails:
+                      recipientName: "John Doe"
+                      ifscCode: "HDFC0000123"
+                      bankAccountNumber: "9876543210"
+                    responseKafkaTopic: "b2b-nova-topic"
+                  - requesterAccountId: "IN123456789"
+                    amount: 1000.00
+                    referenceId: "PAYOUT_IN_20231025_002"
+                    source: "b2b_payments"
+                    recipientDetails:
+                      recipientName: "John Doe"
+                      ifscCode: "HDFC0000123"
+                      bankAccountNumber: "9876543210"
+                    responseKafkaTopic: "b2b-nova-topic"
               
               "invalid payload":
                 value:
-                  requests:
-                    - requesterAccountId: "IN123456789"
-                      amount: 500.00
-                      referenceId: "PAYOUT_IN_20231025_003"
-                      source: "b2b_payments"
-                      recipientDetails:
-                        recipientName: "John Doe"
-                        bankAccountNumber: "9876543210"
-                      responseKafkaTopic: "b2b-nova-topic"
+                  - requesterAccountId: "IN123456789"
+                    amount: 500.00
+                    referenceId: "PAYOUT_IN_20231025_003"
+                    source: "b2b_payments"
+                    recipientDetails:
+                      recipientName: "John Doe"
+                      bankAccountNumber: "9876543210"
+                    responseKafkaTopic: "b2b-nova-topic"
 
       responses:
         '200':
